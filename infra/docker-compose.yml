@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  # SAHAAY API Service
+  api:
+    build:
+      context: ../services/api
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../services/api:/app # Mounts local code for hot-reloading
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      # Example: How you would pass DB config to your app
+      - DATABASE_URL=postgresql://sahay_user:sahay_password@postgres/sahay_db
+      - REDIS_URL=redis://redis:6379
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=sahay_user
+      - POSTGRES_PASSWORD=sahay_password
+      - POSTGRES_DB=sahay_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Redis Cache
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  # MinIO S3-compatible Storage
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"  # API port
+      - "9001:9001"  # Console UI port
+    environment:
+      - MINIO_ROOT_USER=minio_admin
+      - MINIO_ROOT_PASSWORD=minio_password
+    command: server /data --console-address ":9001"
+
+volumes:
+  postgres_data:

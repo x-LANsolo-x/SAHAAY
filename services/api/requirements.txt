@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard]
+
+# Auth & DB
+sqlalchemy>=2.0
+passlib[bcrypt]
+
+# Add these for testing later
+pytest
+httpx
+anyio
+ruff
